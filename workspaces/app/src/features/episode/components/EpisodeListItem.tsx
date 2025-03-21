@@ -9,7 +9,6 @@ import { Spacer } from '../../../foundation/components/Spacer';
 import { Text } from '../../../foundation/components/Text';
 import { useImage } from '../../../foundation/hooks/useImage';
 import { Color, Radius, Space, Typography } from '../../../foundation/styles/variables';
-import { useEpisode } from '../hooks/useEpisode';
 
 const _Wrapper = styled.li`
   width: 100%;
@@ -29,12 +28,18 @@ const _ImgWrapper = styled.div`
 
 type Props = {
   bookId: string;
-  episodeId: string;
+  episode: {
+    id: string;
+    chapter: number;
+    description: string;
+    name: string;
+    image: {
+      id: string;
+    };
+  };
 };
 
-export const EpisodeListItem: React.FC<Props> = ({ bookId, episodeId }) => {
-  const { data: episode } = useEpisode({ params: { episodeId } });
-
+export const EpisodeListItem: React.FC<Props> = ({ bookId, episode }) => {
   const imageUrl = useImage({ height: 96, imageId: episode.image.id, width: 96 });
 
   return (
