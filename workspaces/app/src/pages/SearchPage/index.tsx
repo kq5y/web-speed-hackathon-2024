@@ -29,7 +29,7 @@ const SearchPage: React.FC = () => {
 
   return (
     <Box px={Space * 2}>
-      <Input disabled={!isClient} onChange={onChangedInput} />
+      <Input value={keyword} disabled={!isClient} onChange={onChangedInput} />
       <Box aria-labelledby={searchResultsA11yId} as="section" maxWidth="100%" py={Space * 2} width="100%">
         <Text color={Color.MONO_100} id={searchResultsA11yId} typography={Typography.NORMAL20} weight="bold">
           検索結果
