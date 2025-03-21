@@ -19,7 +19,6 @@ import {
 } from '@chakra-ui/react';
 import { useFormik } from 'formik';
 import { useId, useMemo, useState } from 'react';
-import { create } from 'zustand';
 
 import { useAuthorList } from '../../features/authors/hooks/useAuthorList';
 import { isContains } from '../../lib/filter/isContains';
@@ -39,26 +38,6 @@ const AuthorModalMode = {
   None: 'None',
 } as const;
 type AuthorModalMode = (typeof AuthorModalMode)[keyof typeof AuthorModalMode];
-
-type AuthorModalState =
-  | {
-      mode: typeof AuthorModalMode.None;
-      params: object;
-    }
-  | {
-      mode: typeof AuthorModalMode.Detail;
-      params: { authorId: string };
-    }
-  | {
-      mode: typeof AuthorModalMode.Create;
-      params: object;
-    };
-
-type AuthorModalAction = {
-  close: () => void;
-  openCreate: () => void;
-  openDetail: (authorId: string) => void;
-};
 
 export const AuthorListPage: React.FC = () => {
   const { data: authorList = [] } = useAuthorList();
@@ -93,26 +72,23 @@ export const AuthorListPage: React.FC = () => {
     }
   }, [formik.values.kind, formik.values.query, authorList]);
 
-  const [useModalStore] = useState(() => {
-    return create<AuthorModalState & AuthorModalAction>()((set) => ({
-      ...{
-        mode: AuthorModalMode.None,
-        params: {},
-      },
-      ...{
-        close() {
-          set({ mode: AuthorModalMode.None, params: {} });
-        },
-        openCreate() {
-          set({ mode: AuthorModalMode.Create, params: {} });
-        },
-        openDetail(authorId) {
-          set({ mode: AuthorModalMode.Detail, params: { authorId } });
-        },
-      },
-    }));
-  });
-  const modalState = useModalStore();
+  const [modalMode, setModalMode] = useState<AuthorModalMode>(AuthorModalMode.None);
+  const [modalParams, setModalParams] = useState<{
+    authorId?: string;
+  }>({});
+
+  const openCreateModal = () => {
+    setModalMode(AuthorModalMode.Create);
+    setModalParams({});
+  }
+  const openDetailModal = (authorId: string) => {
+    setModalMode(AuthorModalMode.Detail);
+    setModalParams({ authorId });
+  }
+  const closeModal = () => {
+    setModalMode(AuthorModalMode.None);
+    setModalParams({});
+  }
 
   return (
     <>
@@ -170,7 +146,7 @@ export const AuthorListPage: React.FC = () => {
             <Text as="h2" fontSize="xl" fontWeight="bold" id={authorListA11yId}>
               作者一覧
             </Text>
-            <Button colorScheme="teal" onClick={() => modalState.openCreate()} variant="solid">
+            <Button colorScheme="teal" onClick={() => openCreateModal()} variant="solid">
               作者を追加
             </Button>
           </Flex>
@@ -186,7 +162,7 @@ export const AuthorListPage: React.FC = () => {
                 {filteredAuthorList.map((author) => (
                   <Tr key={author.id}>
                     <Td textAlign="center" verticalAlign="middle">
-                      <Button colorScheme="teal" onClick={() => modalState.openDetail(author.id)} variant="solid">
+                      <Button colorScheme="teal" onClick={() => openDetailModal(author.id)} variant="solid">
                         詳細
                       </Button>
                     </Td>
@@ -204,11 +180,11 @@ export const AuthorListPage: React.FC = () => {
         </StackItem>
       </Stack>
 
-      {modalState.mode === AuthorModalMode.Detail ? (
-        <AuthorDetailModal isOpen authorId={modalState.params.authorId} onClose={() => modalState.close()} />
+      {modalMode === AuthorModalMode.Detail && modalParams.authorId ? (
+        <AuthorDetailModal isOpen authorId={modalParams.authorId} onClose={() => closeModal()} />
       ) : null}
-      {modalState.mode === AuthorModalMode.Create ? (
-        <CreateAuthorModal isOpen onClose={() => modalState.close()} />
+      {modalMode === AuthorModalMode.Create ? (
+        <CreateAuthorModal isOpen onClose={() => closeModal()} />
       ) : null}
     </>
   );

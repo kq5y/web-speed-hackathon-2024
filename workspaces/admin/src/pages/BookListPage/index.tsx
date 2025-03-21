@@ -19,7 +19,6 @@ import {
 } from '@chakra-ui/react';
 import { useFormik } from 'formik';
 import { useId, useMemo, useState } from 'react';
-import { create } from 'zustand';
 
 import { useBookList } from '../../features/books/hooks/useBookList';
 import { isContains } from '../../lib/filter/isContains';
@@ -41,26 +40,6 @@ const BookModalMode = {
   None: 'None',
 } as const;
 type BookModalMode = (typeof BookModalMode)[keyof typeof BookModalMode];
-
-type BookModalState =
-  | {
-      mode: typeof BookModalMode.None;
-      params: object;
-    }
-  | {
-      mode: typeof BookModalMode.Detail;
-      params: { bookId: string };
-    }
-  | {
-      mode: typeof BookModalMode.Create;
-      params: object;
-    };
-
-type BookModalAction = {
-  close: () => void;
-  openCreate: () => void;
-  openDetail: (bookId: string) => void;
-};
 
 export const BookListPage: React.FC = () => {
   const { data: bookList = [] } = useBookList();
@@ -106,26 +85,23 @@ export const BookListPage: React.FC = () => {
     }
   }, [formik.values.kind, formik.values.query, bookList]);
 
-  const [useModalStore] = useState(() => {
-    return create<BookModalState & BookModalAction>()((set) => ({
-      ...{
-        mode: BookModalMode.None,
-        params: {},
-      },
-      ...{
-        close() {
-          set({ mode: BookModalMode.None, params: {} });
-        },
-        openCreate() {
-          set({ mode: BookModalMode.Create, params: {} });
-        },
-        openDetail(bookId) {
-          set({ mode: BookModalMode.Detail, params: { bookId } });
-        },
-      },
-    }));
-  });
-  const modalState = useModalStore();
+  const [modalMode, setModalMode] = useState<BookModalMode>(BookModalMode.None);
+  const [modalParams, setModalParams] = useState<{
+    bookId?: string;
+  }>({});
+
+  const openCreateModal = () => {
+    setModalMode(BookModalMode.Create);
+    setModalParams({});
+  }
+  const openDetailModal = (bookId: string) => {
+    setModalMode(BookModalMode.Detail);
+    setModalParams({ bookId });
+  }
+  const closeModal = () => {
+    setModalMode(BookModalMode.None);
+    setModalParams({});
+  }
 
   return (
     <>
@@ -201,7 +177,7 @@ export const BookListPage: React.FC = () => {
             <Text as="h2" fontSize="xl" fontWeight="bold" id={bookListA11yId}>
               作品一覧
             </Text>
-            <Button colorScheme="teal" onClick={() => modalState.openCreate()} variant="solid">
+            <Button colorScheme="teal" onClick={() => openCreateModal()} variant="solid">
               作品を追加
             </Button>
           </Flex>
@@ -218,7 +194,7 @@ export const BookListPage: React.FC = () => {
                 {filteredBookList.map((book) => (
                   <Tr key={book.id}>
                     <Td textAlign="center" verticalAlign="middle">
-                      <Button colorScheme="teal" onClick={() => modalState.openDetail(book.id)} variant="solid">
+                      <Button colorScheme="teal" onClick={() => openDetailModal(book.id)} variant="solid">
                         詳細
                       </Button>
                     </Td>
@@ -242,10 +218,10 @@ export const BookListPage: React.FC = () => {
         </StackItem>
       </Stack>
 
-      {modalState.mode === BookModalMode.Detail ? (
-        <BookDetailModal isOpen bookId={modalState.params.bookId} onClose={() => modalState.close()} />
+      {modalMode === BookModalMode.Detail && modalParams.bookId ? (
+        <BookDetailModal isOpen bookId={modalParams.bookId} onClose={() => closeModal()} />
       ) : null}
-      {modalState.mode === BookModalMode.Create ? <CreateBookModal isOpen onClose={() => modalState.close()} /> : null}
+      {modalMode === BookModalMode.Create ? <CreateBookModal isOpen onClose={() => closeModal()} /> : null}
     </>
   );
 };
