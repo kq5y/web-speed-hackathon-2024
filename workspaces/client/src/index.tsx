@@ -7,15 +7,14 @@ import { SWRConfig } from 'swr';
 import { AdminApp } from '@wsh-2024/admin/src/index';
 import { ClientApp } from '@wsh-2024/app/src/index';
 
-import { preloadImages } from './utils/preloadImages';
+//import { preloadImages } from './utils/preloadImages';
 import { registerServiceWorker } from './utils/registerServiceWorker';
 
 const main = async () => {
-  await registerServiceWorker();
-  await preloadImages();
-
   const rootElement = document.getElementById('root');
   if (!rootElement) throw new Error('Root element not found');
+
+  await registerServiceWorker();
 
   if (window.location.pathname.startsWith('/admin')) {
     ReactDOM.createRoot(rootElement).render(<AdminApp />);
