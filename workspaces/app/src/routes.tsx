@@ -1,13 +1,14 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { styled } from 'styled-components';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
-import { SvgIcon } from './features/icons/components/SvgIcon';
 import { Link } from './foundation/components/Link';
 import { Text } from './foundation/components/Text';
 import { ActionLayout } from './foundation/layouts/ActionLayout';
 import { CommonLayout } from './foundation/layouts/CommonLayout';
 import { Color, Space, Typography } from './foundation/styles/variables';
+
 const AuthorDetailPage = React.lazy(() => import('./pages/AuthorDetailPage/index').then(m => ({ default: m.AuthorDetailPage })));
 const BookDetailPage = React.lazy(() => import('./pages/BookDetailPage/index').then(m => ({ default: m.BookDetailPage })));
 const EpisodeDetailPage = React.lazy(() => import('./pages/EpisodeDetailPage/index').then(m => ({ default: m.EpisodeDetailPage })));
@@ -35,7 +36,7 @@ export const Router: React.FC = () => {
             <ActionLayout
               leftContent={
                 <_BackToTopButton href={'/'}>
-                  <SvgIcon color={Color.MONO_100} height={32} type="ArrowBack" width={32} />
+                  <ArrowBackIcon style={{ color: Color.MONO_100, width: 32, height: 32 }} />
                   <Text color={Color.MONO_100} typography={Typography.NORMAL16} weight="bold">
                     トップへ戻る
                   </Text>
