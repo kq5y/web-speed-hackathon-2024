@@ -1,27 +1,34 @@
-import { compareWithFlags, PRIMARY as UCA_L1_FLAG, SECONDARY as UCA_L2_FLAG } from 'unicode-collation-algorithm2';
-
-// UCA_L1_FLAG はベース文字、UCA_L2_FLAG は濁点・半濁点・アクセントを区別する (sensitivity: accent に相当)
-const SENSITIVITY_ACCENT_FLAG = UCA_L1_FLAG ^ UCA_L2_FLAG;
-
-type Params = {
-  query: string;
-  target: string;
-};
-
 // ひらがな・カタカナ・半角・全角を区別せずに文字列が含まれているかを調べる
-export function isContains({ query, target }: Params): boolean {
+export function isContains({ query, target }: { query: string; target: string }): boolean {
+  if (query.length === 0) return true;
+  if (target.length < query.length) return false;
+
+  // Create a collator that ignores case, accents, and variant forms
+  // but distinguishes base characters
+  const collator = new Intl.Collator('ja-JP', {
+    sensitivity: 'accent', // equivalent to UCA_L1_FLAG ^ UCA_L2_FLAG
+    ignorePunctuation: false,
+    usage: 'search'
+  });
+
   // target の先頭から順に query が含まれているかを調べる
-  TARGET_LOOP: for (let offset = 0; offset <= target.length - query.length; offset++) {
+  for (let offset = 0; offset <= target.length - query.length; offset++) {
+    let match = true;
+
     for (let idx = 0; idx < query.length; idx++) {
-      // 1文字ずつ Unicode Collation Algorithm で比較する
-      // unicode-collation-algorithm2 は Default Unicode Collation Element Table (DUCET) を collation として使う
-      if (compareWithFlags(target[offset + idx]!, query[idx]!, SENSITIVITY_ACCENT_FLAG) !== 0) {
-        continue TARGET_LOOP;
+      const targetChar = target.charAt(offset + idx);
+      const queryChar = query.charAt(idx);
+      // 1文字ずつ Intl.Collator で比較する
+      if (collator.compare(targetChar, queryChar) !== 0) {
+        match = false;
+        break;
       }
     }
-    // query のすべての文字が含まれていたら true を返す
-    return true;
+
+    if (match) {
+      return true;
+    }
   }
-  // target の最後まで query が含まれていなかったら false を返す
+
   return false;
 }
