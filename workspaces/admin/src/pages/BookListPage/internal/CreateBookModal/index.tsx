@@ -103,7 +103,7 @@ export const CreateBookModal: React.FC<Props> = ({ isOpen, onClose }) => {
           <Box as="form" onSubmit={formik.handleSubmit} p={4}>
             <Flex align="center" pb={2}>
               <Box flexShrink={0} position="relative">
-                <Image aspectRatio="3 / 4" height={256} objectFit="cover" src={avatorUrl} width={192} />
+                <Image aspectRatio="3 / 4" height={256} loading='lazy' objectFit="cover" src={avatorUrl} width={192} />
 
                 <FormControl
                   alignItems="center"
