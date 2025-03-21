@@ -9,7 +9,7 @@ import { Link } from '../../../foundation/components/Link';
 import { Separator } from '../../../foundation/components/Separator';
 import { Spacer } from '../../../foundation/components/Spacer';
 import { Text } from '../../../foundation/components/Text';
-import { useImage } from '../../../foundation/hooks/useImage';
+import { useImageSrc } from '../../../foundation/hooks/useImageSrc';
 import { Color, Radius, Space, Typography } from '../../../foundation/styles/variables';
 
 import type { GetFeatureListResponse } from '@wsh-2024/schema/src/api/features/GetFeatureListResponse';
@@ -43,8 +43,8 @@ type Props = {
 };
 
 const RankingCard: React.FC<Props> = ({ book }) => {
-  const imageUrl = useImage({ height: 96, imageId: book.image.id, width: 96 });
-  const authorImageUrl = useImage({ height: 32, imageId: book.author.image.id, width: 32 });
+  const imageUrl = useImageSrc({ height: 96, imageId: book.image.id, width: 96 });
+  const authorImageUrl = useImageSrc({ height: 32, imageId: book.author.image.id, width: 32 });
 
   return (
     <_Wrapper>

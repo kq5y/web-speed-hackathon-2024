@@ -7,7 +7,7 @@ import { Link } from '../../../foundation/components/Link';
 import { Separator } from '../../../foundation/components/Separator';
 import { Spacer } from '../../../foundation/components/Spacer';
 import { Text } from '../../../foundation/components/Text';
-import { useImage } from '../../../foundation/hooks/useImage';
+import { useImageSrc } from '../../../foundation/hooks/useImageSrc';
 import { Color, Radius, Space, Typography } from '../../../foundation/styles/variables';
 
 const _Wrapper = styled.li`
@@ -40,7 +40,7 @@ type Props = {
 };
 
 export const EpisodeListItem: React.FC<Props> = ({ bookId, episode }) => {
-  const imageUrl = useImage({ height: 96, imageId: episode.image.id, width: 96 });
+  const imageUrl = useImageSrc({ height: 96, imageId: episode.image.id, width: 96 });
 
   return (
     <_Wrapper>
